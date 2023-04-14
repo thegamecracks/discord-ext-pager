@@ -109,12 +109,12 @@ class ListPageSource(
         self.items = items
         self.page_size = page_size
 
-    def get_page(self, index):
+    def get_page(self, index: int) -> list[E]:
         start = index * self.page_size
         return self.items[start : start + self.page_size]
 
     @functools.cached_property
-    def max_pages(self):
+    def max_pages(self) -> int:
         pages, remainder = divmod(len(self.items), self.page_size)
         return pages + bool(remainder)
 
@@ -134,7 +134,7 @@ class AsyncIteratorPageSource(
         self._exhausted = False
         self.page_size = page_size
 
-    async def get_page(self, index: int):
+    async def get_page(self, index: int) -> list[E]:
         start = index * self.page_size
         end = start + self.page_size
         if self._exhausted:
@@ -159,7 +159,7 @@ class AsyncIteratorPageSource(
         return self._cache[start:end]
 
     @property
-    def max_pages(self):
+    def max_pages(self) -> int:
         return self._max_index + (not self._exhausted)
 
 
@@ -212,7 +212,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             PageSource[T, S_co, V_contra],
         ],
         allowed_users: Optional[Collection[int]] = None,
-        timeout_action=TimeoutAction.CLEAR,
+        timeout_action: TimeoutAction = TimeoutAction.CLEAR,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -231,11 +231,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.option_sources: dict[str, PageSource] = {}
 
     @property
-    def current_source(self):
+    def current_source(self) -> PageSource[T, S_co, V_contra]:
         return self.sources[-1]
 
     @property
-    def current_index(self):
+    def current_index(self) -> int:
         return self.current_source.current_index
 
     @current_index.setter
@@ -243,22 +243,22 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.current_source.current_index = index
 
     @property
-    def can_navigate(self):
+    def can_navigate(self) -> bool:
         return len(self.options) > 0
 
     @property
-    def can_paginate(self):
+    def can_paginate(self) -> bool:
         return self.current_source.max_pages > 1
 
     @property
-    def can_go_back(self):
+    def can_go_back(self) -> bool:
         return len(self.sources) > 1
 
     @functools.cached_property
     def _pagination_buttons(self) -> tuple[discord.ui.Button]:
         return self.first_page, self.prev_page, self.next_page, self.last_page  # type: ignore
 
-    async def show_page(self, index: int):
+    async def show_page(self, index: int) -> None:
         self.current_index = index
         maybe_coro = discord.utils.maybe_coroutine
 
@@ -287,8 +287,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
     async def start(
         self,
         channel: Union[discord.abc.Messageable, discord.Interaction],
-        ephemeral=True,
-    ):
+        ephemeral: bool = True,
+    ) -> None:
         await self.show_page(self.current_source.current_index)
         if isinstance(channel, discord.Interaction):
             kwargs = self._get_message_kwargs(initial_response=True)
@@ -297,12 +297,12 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         else:
             self.message = await channel.send(**self._get_message_kwargs())
 
-    async def interaction_check(self, interaction):
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if self.allowed_users is not None:
             return interaction.user.id in self.allowed_users
         return True
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         action = self.timeout_action
         if self.message is None or action is TimeoutAction.NONE:
             return
@@ -319,7 +319,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         else:
             raise TypeError(f"unknown timeout action: {action!r}")
 
-    def _get_message_kwargs(self, *, initial_response=False) -> dict[str, Any]:
+    def _get_message_kwargs(self, *, initial_response: bool = False) -> dict[str, Any]:
         # initial_response indicates if we can use view=None, necessary as
         # InteractionResponse.send_message() does not accept view=None
         kwargs = dict(self.page)
@@ -335,11 +335,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
 
         return kwargs
 
-    async def _respond(self, interaction: discord.Interaction):
+    async def _respond(self, interaction: discord.Interaction) -> None:
         await interaction.response.edit_message(**self._get_message_kwargs())
 
     # noinspection PyUnresolvedReferences
-    def _refresh_components(self):
+    def _refresh_components(self) -> None:
         """Update the state of each component in this view according to
         the current source and page.
 
@@ -384,7 +384,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.add_item(self.stop_button)
 
     @discord.ui.select(options=[], placeholder="Navigate...", row=0)
-    async def navigate(self, interaction, select: discord.ui.Select):
+    async def navigate(
+        self,
+        interaction: discord.Interaction,
+        select: discord.ui.Select,
+    ) -> None:
         source = self.option_sources[select.values[0]]
         self.sources.append(source)
         await self.show_page(self.current_index)
@@ -395,7 +399,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.blurple,
         row=1,
     )
-    async def first_page(self, interaction, button):
+    async def first_page(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         await self.show_page(0)
         await self._respond(interaction)
 
@@ -404,7 +412,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.blurple,
         row=1,
     )
-    async def prev_page(self, interaction, button):
+    async def prev_page(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         await self.show_page(self.current_index - 1)
         await self._respond(interaction)
 
@@ -413,7 +425,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.blurple,
         row=1,
     )
-    async def next_page(self, interaction, button):
+    async def next_page(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         await self.show_page(self.current_index + 1)
         await self._respond(interaction)
 
@@ -422,7 +438,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.blurple,
         row=1,
     )
-    async def last_page(self, interaction, button):
+    async def last_page(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         await self.show_page(self.current_source.max_pages - 1)
         await self._respond(interaction)
 
@@ -431,7 +451,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.success,
         row=1,
     )
-    async def stop_button(self, interaction, button):
+    async def stop_button(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         self.stop()
         await interaction.message.delete()
 
@@ -440,7 +464,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         style=discord.ButtonStyle.blurple,
         row=2,
     )
-    async def back_button(self, interaction, button):
+    async def back_button(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
         self.sources.pop()
         await self.show_page(self.current_index)
         await self._respond(interaction)
