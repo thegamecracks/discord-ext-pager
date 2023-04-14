@@ -11,10 +11,13 @@ from typing import (
     AsyncIterator,
     Collection,
     Coroutine,
+    Dict,
     Generic,
     Iterable,
+    List,
     Optional,
     Sequence,
+    Tuple,
     TypedDict,
     TypeVar,
     Union,
@@ -98,18 +101,18 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
 
 
 class ListPageSource(
-    PageSource[list[E], S_co, V_contra],
+    PageSource[List[E], S_co, V_contra],
     ABC,
     Generic[E, S_co, V_contra],
 ):
     """Paginates a list of elements."""
 
-    def __init__(self, items: list[E], *args, page_size: int, **kwargs):
+    def __init__(self, items: List[E], *args, page_size: int, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = items
         self.page_size = page_size
 
-    def get_page(self, index: int) -> list[E]:
+    def get_page(self, index: int) -> List[E]:
         start = index * self.page_size
         return self.items[start : start + self.page_size]
 
@@ -120,7 +123,7 @@ class ListPageSource(
 
 
 class AsyncIteratorPageSource(
-    PageSource[list[E], S_co, V_contra],
+    PageSource[List[E], S_co, V_contra],
     ABC,
     Generic[E, S_co, V_contra],
 ):
@@ -134,7 +137,7 @@ class AsyncIteratorPageSource(
         self._exhausted = False
         self.page_size = page_size
 
-    async def get_page(self, index: int) -> list[E]:
+    async def get_page(self, index: int) -> List[E]:
         start = index * self.page_size
         end = start + self.page_size
         if self._exhausted:
@@ -255,7 +258,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         return len(self.sources) > 1
 
     @functools.cached_property
-    def _pagination_buttons(self) -> tuple[discord.ui.Button, ...]:
+    def _pagination_buttons(self) -> Tuple[discord.ui.Button, ...]:
         return self.first_page, self.prev_page, self.next_page, self.last_page
 
     async def show_page(self, index: int) -> None:
@@ -320,7 +323,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         else:
             raise TypeError(f"unknown timeout action: {action!r}")
 
-    def _get_message_kwargs(self, *, initial_response: bool = False) -> dict[str, Any]:
+    def _get_message_kwargs(self, *, initial_response: bool = False) -> Dict[str, Any]:
         # initial_response indicates if we can use view=None, necessary as
         # InteractionResponse.send_message() does not accept view=None
         kwargs = dict(self.page)
