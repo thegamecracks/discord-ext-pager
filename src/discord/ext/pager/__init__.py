@@ -13,6 +13,8 @@ from typing import (
 
 import discord
 
+__version__ = "1.0.0"
+
 E = TypeVar('E')
 T = TypeVar('T')
 S_co = TypeVar('S_co', bound="PageSource", covariant=True)
