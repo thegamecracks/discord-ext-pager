@@ -148,7 +148,7 @@ class AsyncIteratorPageSource(
             max_index = index + 1
             for i in range(required):
                 try:
-                    new_items.append(await anext(self._iterator))
+                    new_items.append(await self._iterator.__anext__())
                 except StopAsyncIteration:
                     max_index = math.ceil((len(self._cache) + i) / self.page_size)
                     self._exhausted = True
