@@ -1,5 +1,7 @@
 # discord-ext-pager
 
+[![PyPI](https://img.shields.io/pypi/v/discord-ext-pager?label=View%20on%20pypi&style=flat-square)](https://pypi.org/project/discord-ext-pager/)
+
 A simple view-based paginator library for discord.py 2.0.
 
 ## Installation
