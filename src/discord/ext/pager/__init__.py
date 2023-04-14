@@ -313,7 +313,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             await self.message.delete()
         elif action is TimeoutAction.DISABLE:
             for item in self.children:
-                item.disabled = True
+                if hasattr(item, "disabled"):
+                    item.disabled = True  # type: ignore
 
             await self.message.edit(view=self)
         else:
