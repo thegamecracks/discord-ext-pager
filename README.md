@@ -39,6 +39,10 @@ from typing import Any, List
 from discord.ext.pager import ListPageSource, PaginatorView
 
 class EmbedListPageSource(ListPageSource[Any, None, PaginatorView]):
+    #                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    #            These type parameters denote the page item type,
+    #            source type for page options (demonstrated later),
+    #            and view type. Only needed for static typing.
     """Takes a list of items and formats it in an embed."""
 
     def format_page(self, view: PaginatorView, page: List[Any]):
@@ -83,6 +87,8 @@ class MessageNavigator(ListPageSource[MessageSource, MessageSource, PaginatorVie
     """A list of messages for the user to select from."""
 
     def get_page_options(self, view: PaginatorView, page: List[MessageSource]):
+        # PageOption() takes the same arguments as discord.SelectOption,
+        # except that source= is also required
         return [PageOption(source=source, label=source.message) for source in page]
 
     def format_page(self, view: PaginatorView, page: List[MessageSource]):
