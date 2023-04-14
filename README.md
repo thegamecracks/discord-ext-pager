@@ -104,8 +104,6 @@ to the `PaginatorView(sources=)` argument.
 
 Click on each example to see the source code:
 
-(TODO: use raw github links)
+[![Tag leaderboard](https://github.com/thegamecracks/discord-ext-pager/blob/main/docs/images/thegamebot_tags.png?raw=true)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/tags/__init__.py#L123-L162)
 
-[![Tag leaderboard](/docs/images/thegamebot_tags.png)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/tags/__init__.py#L123-L162)
-
-[![Help command](/docs/images/thegamebot_help.png)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/helpcommand.py#L26-L249)
+[![Help command](https://github.com/thegamecracks/discord-ext-pager/blob/main/docs/images/thegamebot_help.png?raw=true)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/helpcommand.py#L26-L249)
