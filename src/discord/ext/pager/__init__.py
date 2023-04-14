@@ -7,7 +7,7 @@ import math
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import (
-    Any, AsyncIterator, Collection, Coroutine, Generic, Sequence,
+    Any, AsyncIterator, Collection, Coroutine, Generic, Iterable, Sequence,
     TypedDict, TypeVar, cast
 )
 
@@ -175,7 +175,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
     """
     def __init__(
         self, *args,
-        sources: Sequence[PageSource[T, S_co, V_contra]] | PageSource[T, S_co, V_contra],
+        sources: Iterable[PageSource[T, S_co, V_contra]] | PageSource[T, S_co, V_contra],
         allowed_users: Collection[int] = None,
         timeout_action = TimeoutAction.CLEAR,
         **kwargs
@@ -183,9 +183,10 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         super().__init__(*args, **kwargs)
         if isinstance(sources, PageSource):
             sources = [sources]
-        elif len(sources) == 0:
-            raise ValueError('must provide at least one page source')
-        self.sources = cast(Sequence[PageSource[T, S_co, V_contra]], sources)
+        else:
+            self.sources = list(sources)
+            if len(self.sources) == 0:
+                raise ValueError('must provide at least one page source')
         self.allowed_users = allowed_users
         self.timeout_action = timeout_action
 
