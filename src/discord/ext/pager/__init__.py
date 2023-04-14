@@ -8,10 +8,11 @@ import functools
 import math
 from typing import (
     Any, AsyncIterator, Collection, Coroutine, Generic, Sequence,
-    TypeAlias, TypedDict, TypeVar, cast
+    TypedDict, TypeVar, cast
 )
 
 import discord
+from typing_extensions import TypeAlias
 
 __version__ = "1.0.0"
 
