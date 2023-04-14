@@ -42,11 +42,11 @@ E = TypeVar("E")
 T = TypeVar("T")
 S_co = TypeVar("S_co", bound="PageSource", covariant=True)
 V_contra = TypeVar("V_contra", bound="PaginatorView", contravariant=True)
-FP: TypeAlias = "Union[PageParams, str, discord.Embed]"
+FP: TypeAlias = "Union[_PageParams, str, discord.Embed]"
 PO: TypeAlias = "Sequence[PageOption[S_co]]"
 
 
-class PageParams(TypedDict, total=False):
+class _PageParams(TypedDict, total=False):
     content: str
     embed: discord.Embed
 
@@ -238,7 +238,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.timeout_action = timeout_action
 
         self.message: Optional[discord.Message] = None
-        self.page: PageParams = {}
+        self.page: _PageParams = {}
         self.options: Sequence[PageOption[S_co]] = []
         self.option_sources: dict[str, PageSource] = {}
 
@@ -282,7 +282,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             params = {"embed": params}
         elif not isinstance(params, dict):
             raise TypeError("format_page() must return a dict, str, or Embed")
-        self.page = cast(PageParams, params)
+        self.page = cast(_PageParams, params)
 
         options: Sequence[PageOption[S_co]] = await maybe_coro(
             self.current_source.get_page_options, self, page  # type: ignore
