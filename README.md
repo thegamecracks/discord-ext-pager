@@ -106,7 +106,7 @@ to the `PaginatorView(sources=)` argument.
 
 ## Examples
 
-Click on each example to see the source code:
+Click on any example to see their source code:
 
 [![Tag leaderboard](https://github.com/thegamecracks/discord-ext-pager/blob/main/docs/images/thegamebot_tags.png?raw=true)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/tags/__init__.py#L123-L162)
 
