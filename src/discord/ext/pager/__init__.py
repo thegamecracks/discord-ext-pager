@@ -255,15 +255,15 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         return len(self.sources) > 1
 
     @functools.cached_property
-    def _pagination_buttons(self) -> tuple[discord.ui.Button]:
-        return self.first_page, self.prev_page, self.next_page, self.last_page  # type: ignore
+    def _pagination_buttons(self) -> tuple[discord.ui.Button, ...]:
+        return self.first_page, self.prev_page, self.next_page, self.last_page
 
     async def show_page(self, index: int) -> None:
         self.current_index = index
         maybe_coro = discord.utils.maybe_coroutine
 
         page = await maybe_coro(self.current_source.get_page, index)
-        params = await maybe_coro(self.current_source.format_page, self, page)
+        params = await maybe_coro(self.current_source.format_page, self, page)  # type: ignore
         if isinstance(params, str):
             params = {"content": params}
         elif isinstance(params, discord.Embed):
@@ -272,8 +272,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             raise TypeError("format_page() must return a dict, str, or Embed")
         self.page = cast(PageParams, params)
 
-        options: list[PageOption] = await maybe_coro(
-            self.current_source.get_page_options, self, page
+        options: Sequence[PageOption[S_co]] = await maybe_coro(
+            self.current_source.get_page_options, self, page  # type: ignore
         )
         option_sources = {}
         for i, option in enumerate(options):
@@ -363,7 +363,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         # Navigation (select menu)
         if self.can_navigate:
             self.add_item(self.navigate)
-            self.navigate.options = self.options
+            self.navigate.options = list(self.options)
 
         # Pagination (left/right)
         if self.can_paginate:
@@ -457,7 +457,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         button: discord.ui.Button,
     ) -> None:
         self.stop()
-        await interaction.message.delete()
+        await interaction.message.delete()  # type: ignore  # message is not None
 
     @discord.ui.button(
         emoji="\N{LEFTWARDS ARROW WITH HOOK}",
