@@ -4,9 +4,11 @@ A simple view-based paginator library for discord.py 2.0.
 
 ## Installation
 
-This package is available on pip as `discord-ext-pager`.
+This package is available on pip as [`discord-ext-pager`].
 If you have Git, you may also choose to install the latest version
 using `pip install git+https://github.com/thegamecracks/discord-ext-pager`.
+
+[`discord-ext-pager`]: https://pypi.org/project/discord-ext-pager/
 
 ## Basic Usage
 
