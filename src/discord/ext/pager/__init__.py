@@ -7,8 +7,18 @@ import math
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import (
-    Any, AsyncIterator, Collection, Coroutine, Generic, Iterable, Optional, Sequence,
-    TypedDict, TypeVar, Union, cast
+    Any,
+    AsyncIterator,
+    Collection,
+    Coroutine,
+    Generic,
+    Iterable,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
 )
 
 import discord
@@ -16,10 +26,10 @@ from typing_extensions import TypeAlias
 
 __version__ = "1.0.0"
 
-E = TypeVar('E')
-T = TypeVar('T')
-S_co = TypeVar('S_co', bound="PageSource", covariant=True)
-V_contra = TypeVar('V_contra', bound="PaginatorView", contravariant=True)
+E = TypeVar("E")
+T = TypeVar("T")
+S_co = TypeVar("S_co", bound="PageSource", covariant=True)
+V_contra = TypeVar("V_contra", bound="PaginatorView", contravariant=True)
 FP: TypeAlias = "Union[PageParams, str, discord.Embed]"
 PO: TypeAlias = "Sequence[PageOption[S_co]]"
 
@@ -33,6 +43,7 @@ class PageOption(discord.SelectOption, Generic[S_co]):
     """A select option that can store a nested page
     through the added `source=` kwarg.
     """
+
     def __init__(self, *args, source: S_co, **kwargs):
         super().__init__(*args, **kwargs)
         self.source = source
@@ -40,6 +51,7 @@ class PageOption(discord.SelectOption, Generic[S_co]):
 
 class PageSource(ABC, Generic[T, S_co, V_contra]):
     """The base page source class."""
+
     def __init__(self, *, current_index: int = 0):
         self.current_index = current_index
 
@@ -60,7 +72,11 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         """
         return 1
 
-    def get_page_options(self, view: V_contra, page: T) -> Union[PO, Coroutine[None, None, PO]]:
+    def get_page_options(
+        self,
+        view: V_contra,
+        page: T,
+    ) -> Union[PO, Coroutine[None, None, PO]]:
         """Returns a list of page options for the user to select.
 
         This method may be asynchronous.
@@ -69,7 +85,11 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         return []
 
     @abstractmethod
-    def format_page(self, view: V_contra, page: T) -> Union[FP, Coroutine[None, None, FP]]:
+    def format_page(
+        self,
+        view: V_contra,
+        page: T,
+    ) -> Union[FP, Coroutine[None, None, FP]]:
         """Returns a dictionary presenting the items in the page.
 
         This method may be asynchronous.
@@ -77,8 +97,13 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         """
 
 
-class ListPageSource(PageSource[list[E], S_co, V_contra], ABC, Generic[E, S_co, V_contra]):
+class ListPageSource(
+    PageSource[list[E], S_co, V_contra],
+    ABC,
+    Generic[E, S_co, V_contra],
+):
     """Paginates a list of elements."""
+
     def __init__(self, items: list[E], *args, page_size: int, **kwargs):
         super().__init__(*args, **kwargs)
         self.items = items
@@ -86,7 +111,7 @@ class ListPageSource(PageSource[list[E], S_co, V_contra], ABC, Generic[E, S_co, 
 
     def get_page(self, index):
         start = index * self.page_size
-        return self.items[start:start + self.page_size]
+        return self.items[start : start + self.page_size]
 
     @functools.cached_property
     def max_pages(self):
@@ -94,8 +119,13 @@ class ListPageSource(PageSource[list[E], S_co, V_contra], ABC, Generic[E, S_co, 
         return pages + bool(remainder)
 
 
-class AsyncIteratorPageSource(PageSource[list[E], S_co, V_contra], ABC, Generic[E, S_co, V_contra]):
+class AsyncIteratorPageSource(
+    PageSource[list[E], S_co, V_contra],
+    ABC,
+    Generic[E, S_co, V_contra],
+):
     """Paginates an async iterator."""
+
     def __init__(self, iterator: AsyncIterator[E], *args, page_size: int, **kwargs):
         super().__init__(*args, **kwargs)
         self._cache: list[E] = []
@@ -173,12 +203,17 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         effect if a subclass overrides the `on_timeout()` method.
 
     """
+
     def __init__(
-        self, *args,
-        sources: Union[Iterable[PageSource[T, S_co, V_contra]], PageSource[T, S_co, V_contra]],
+        self,
+        *args,
+        sources: Union[
+            Iterable[PageSource[T, S_co, V_contra]],
+            PageSource[T, S_co, V_contra],
+        ],
         allowed_users: Optional[Collection[int]] = None,
-        timeout_action = TimeoutAction.CLEAR,
-        **kwargs
+        timeout_action=TimeoutAction.CLEAR,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         if isinstance(sources, PageSource):
@@ -186,7 +221,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         else:
             self.sources = list(sources)
             if len(self.sources) == 0:
-                raise ValueError('must provide at least one page source')
+                raise ValueError("must provide at least one page source")
         self.allowed_users = allowed_users
         self.timeout_action = timeout_action
 
@@ -230,14 +265,16 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         page = await maybe_coro(self.current_source.get_page, index)
         params = await maybe_coro(self.current_source.format_page, self, page)
         if isinstance(params, str):
-            params = {'content': params}
+            params = {"content": params}
         elif isinstance(params, discord.Embed):
-            params = {'embed': params}
+            params = {"embed": params}
         elif not isinstance(params, dict):
-            raise TypeError('format_page() must return a dict, str, or Embed')
+            raise TypeError("format_page() must return a dict, str, or Embed")
         self.page = cast(PageParams, params)
 
-        options: list[PageOption] = await maybe_coro(self.current_source.get_page_options, self, page)
+        options: list[PageOption] = await maybe_coro(
+            self.current_source.get_page_options, self, page
+        )
         option_sources = {}
         for i, option in enumerate(options):
             option.value = str(i)
@@ -247,7 +284,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
 
         self._refresh_components()
 
-    async def start(self, channel: Union[discord.abc.Messageable, discord.Interaction], ephemeral=True):
+    async def start(
+        self,
+        channel: Union[discord.abc.Messageable, discord.Interaction],
+        ephemeral=True,
+    ):
         await self.show_page(self.current_source.current_index)
         if isinstance(channel, discord.Interaction):
             kwargs = self._get_message_kwargs(initial_response=True)
@@ -276,7 +317,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
 
             await self.message.edit(view=self)
         else:
-            raise TypeError(f'unknown timeout action: {action!r}')
+            raise TypeError(f"unknown timeout action: {action!r}")
 
     def _get_message_kwargs(self, *, initial_response=False) -> dict[str, Any]:
         # initial_response indicates if we can use view=None, necessary as
@@ -286,11 +327,11 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         can_interact = self.can_navigate or self.can_paginate or self.can_go_back
 
         if max_pages > 0 and can_interact:
-            kwargs['view'] = self
+            kwargs["view"] = self
         else:
             self.stop()
             if not initial_response:
-                kwargs['view'] = None
+                kwargs["view"] = None
 
         return kwargs
 
@@ -342,7 +383,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             self.add_item(self.back_button)
         self.add_item(self.stop_button)
 
-    @discord.ui.select(options=[], placeholder='Navigate...', row=0)
+    @discord.ui.select(options=[], placeholder="Navigate...", row=0)
     async def navigate(self, interaction, select: discord.ui.Select):
         source = self.option_sources[select.values[0]]
         self.sources.append(source)
@@ -350,43 +391,55 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         await self._respond(interaction)
 
     @discord.ui.button(
-        emoji='\N{BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}',
-        style=discord.ButtonStyle.blurple, row=1)
+        emoji="\N{BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}",
+        style=discord.ButtonStyle.blurple,
+        row=1,
+    )
     async def first_page(self, interaction, button):
         await self.show_page(0)
         await self._respond(interaction)
 
     @discord.ui.button(
-        emoji='\N{BLACK LEFT-POINTING TRIANGLE}',
-        style=discord.ButtonStyle.blurple, row=1)
+        emoji="\N{BLACK LEFT-POINTING TRIANGLE}",
+        style=discord.ButtonStyle.blurple,
+        row=1,
+    )
     async def prev_page(self, interaction, button):
         await self.show_page(self.current_index - 1)
         await self._respond(interaction)
 
     @discord.ui.button(
-        emoji='\N{BLACK RIGHT-POINTING TRIANGLE}',
-        style=discord.ButtonStyle.blurple, row=1)
+        emoji="\N{BLACK RIGHT-POINTING TRIANGLE}",
+        style=discord.ButtonStyle.blurple,
+        row=1,
+    )
     async def next_page(self, interaction, button):
         await self.show_page(self.current_index + 1)
         await self._respond(interaction)
 
     @discord.ui.button(
-        emoji='\N{BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}',
-        style=discord.ButtonStyle.blurple, row=1)
+        emoji="\N{BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}",
+        style=discord.ButtonStyle.blurple,
+        row=1,
+    )
     async def last_page(self, interaction, button):
         await self.show_page(self.current_source.max_pages - 1)
         await self._respond(interaction)
 
     @discord.ui.button(
-        emoji='\N{THUMBS UP SIGN}',
-        style=discord.ButtonStyle.success, row=1)
+        emoji="\N{THUMBS UP SIGN}",
+        style=discord.ButtonStyle.success,
+        row=1,
+    )
     async def stop_button(self, interaction, button):
         self.stop()
         await interaction.message.delete()
 
     @discord.ui.button(
-        emoji='\N{LEFTWARDS ARROW WITH HOOK}',
-        style=discord.ButtonStyle.blurple, row=2)
+        emoji="\N{LEFTWARDS ARROW WITH HOOK}",
+        style=discord.ButtonStyle.blurple,
+        row=2,
+    )
     async def back_button(self, interaction, button):
         self.sources.pop()
         await self.show_page(self.current_index)
