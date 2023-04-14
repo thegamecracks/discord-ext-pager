@@ -30,6 +30,7 @@ from typing_extensions import TypeAlias
 __version__ = "1.0.0"
 
 __all__ = (
+    "PageOption",
     "PageSource",
     "ListPageSource",
     "AsyncIteratorPageSource",
