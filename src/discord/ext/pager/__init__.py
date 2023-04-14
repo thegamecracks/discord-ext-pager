@@ -7,8 +7,8 @@ import math
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import (
-    Any, AsyncIterator, Collection, Coroutine, Generic, Iterable, Sequence,
-    TypedDict, TypeVar, cast
+    Any, AsyncIterator, Collection, Coroutine, Generic, Iterable, Optional, Sequence,
+    TypedDict, TypeVar, Union, cast
 )
 
 import discord
@@ -20,7 +20,7 @@ E = TypeVar('E')
 T = TypeVar('T')
 S_co = TypeVar('S_co', bound="PageSource", covariant=True)
 V_contra = TypeVar('V_contra', bound="PaginatorView", contravariant=True)
-FP: TypeAlias = "PageParams | str | discord.Embed"
+FP: TypeAlias = "Union[PageParams, str, discord.Embed]"
 PO: TypeAlias = "Sequence[PageOption[S_co]]"
 
 
@@ -44,7 +44,7 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         self.current_index = current_index
 
     @abstractmethod
-    def get_page(self, index: int) -> T | Coroutine[None, None, T]:
+    def get_page(self, index: int) -> Union[T, Coroutine[None, None, T]]:
         """Returns a page based on the given index.
 
         This method may be asynchronous.
@@ -60,7 +60,7 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         """
         return 1
 
-    def get_page_options(self, view: V_contra, page: T) -> PO | Coroutine[None, None, PO]:
+    def get_page_options(self, view: V_contra, page: T) -> Union[PO, Coroutine[None, None, PO]]:
         """Returns a list of page options for the user to select.
 
         This method may be asynchronous.
@@ -69,7 +69,7 @@ class PageSource(ABC, Generic[T, S_co, V_contra]):
         return []
 
     @abstractmethod
-    def format_page(self, view: V_contra, page: T) -> FP | Coroutine[None, None, FP]:
+    def format_page(self, view: V_contra, page: T) -> Union[FP, Coroutine[None, None, FP]]:
         """Returns a dictionary presenting the items in the page.
 
         This method may be asynchronous.
@@ -175,8 +175,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
     """
     def __init__(
         self, *args,
-        sources: Iterable[PageSource[T, S_co, V_contra]] | PageSource[T, S_co, V_contra],
-        allowed_users: Collection[int] = None,
+        sources: Union[Iterable[PageSource[T, S_co, V_contra]], PageSource[T, S_co, V_contra]],
+        allowed_users: Optional[Collection[int]] = None,
         timeout_action = TimeoutAction.CLEAR,
         **kwargs
     ):
@@ -190,7 +190,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.allowed_users = allowed_users
         self.timeout_action = timeout_action
 
-        self.message: discord.Message | None = None
+        self.message: Optional[discord.Message] = None
         self.page: PageParams = {}
         self.options: Sequence[PageOption[S_co]] = []
         self.option_sources: dict[str, PageSource] = {}
@@ -247,7 +247,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
 
         self._refresh_components()
 
-    async def start(self, channel: discord.abc.Messageable | discord.Interaction, ephemeral=True):
+    async def start(self, channel: Union[discord.abc.Messageable, discord.Interaction], ephemeral=True):
         await self.show_page(self.current_source.current_index)
         if isinstance(channel, discord.Interaction):
             kwargs = self._get_message_kwargs(initial_response=True)
