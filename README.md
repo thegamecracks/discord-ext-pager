@@ -6,19 +6,17 @@ A simple view-based paginator library for discord.py 2.0.
 
 ## Installation
 
-This package is available on pip as [`discord-ext-pager`].
-If you have Git, you may also choose to install the latest version
-using `pip install git+https://github.com/thegamecracks/discord-ext-pager`.
+[discord-ext-pager] is available on PyPI, and as such can be installed using pip.
 
-[`discord-ext-pager`]: https://pypi.org/project/discord-ext-pager/
+[discord-ext-pager]: https://pypi.org/project/discord-ext-pager/
 
-## Basic Usage
+## Usage
 
-Prior users of Danny's [`discord-ext-menus`] will find some familiarity
+Users of Danny's [discord-ext-menus] will find some familiarity
 in this library. Provided are the following classes:
 
 - PaginatorView:
-  The view class that manages the paginator.
+  The view class that manages pagination and navigation.
 - PageSource:
   The base class for sources the paginator view can accept.
 - ListPageSource:
@@ -26,10 +24,11 @@ in this library. Provided are the following classes:
 - AsyncIteratorPageSource:
   The base class for formatting an asynchronous iterator of items.
 - PageOption:
-  A subclass of `discord.SelectOption` that also stores a `PageSource` instance.
-  Used for the navigation select menu.
+  A subclass of `discord.SelectOption` used for presenting navigation options.
 - TimeoutAction:
   An enum for customizing PaginatorView's timeout behaviour.
+
+[discord-ext-menus]: https://github.com/Rapptz/discord-ext-menus
 
 The `PaginatorView` can be instantiated and used by itself, but page formatting
 is handled by subclassing one of the `PageSource` base classes.
@@ -66,7 +65,7 @@ to select from:
 
 ```py
 from typing import List
-from discord.ext.pager import ListPageSource, PageOption, PaginatorView, PageSource
+from discord.ext.pager import ListPageSource, PageOption, PageSource, PaginatorView
 
 class MessageSource(PageSource[str, None, PaginatorView]):
     """A single page for displaying a string."""
@@ -108,11 +107,9 @@ Another button is automatically provided for users to back out to the last
 page source. This can be manually triggered by passing a list of page sources
 to the `PaginatorView(sources=)` argument.
 
-[`discord-ext-menus`]: https://github.com/Rapptz/discord-ext-menus
-
 ## Examples
 
-Click on any example to see their source code:
+Click on an example below to see its source code:
 
 [![Tag leaderboard](https://github.com/thegamecracks/discord-ext-pager/blob/main/docs/images/thegamebot_tags.png?raw=true)](https://github.com/thegamecracks/thegamebot/blob/04d9909877685acd24654a911b1853e2143fc316/bot/cogs/tags/__init__.py#L123-L162)
 
