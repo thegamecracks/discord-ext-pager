@@ -4,13 +4,9 @@
 
 A simple view-based paginator library for discord.py 2.0. Works with Python 3.8+.
 
-## Installation
+## Usage
 
 [discord-ext-pager] is available on PyPI, and as such can be installed using pip.
-
-[discord-ext-pager]: https://pypi.org/project/discord-ext-pager/
-
-## Usage
 
 Users of Danny's [discord-ext-menus] will find some familiarity
 in this library. Provided are the following classes:
@@ -28,6 +24,7 @@ in this library. Provided are the following classes:
 - TimeoutAction:
   An enum for customizing PaginatorView's timeout behaviour.
 
+[discord-ext-pager]: https://pypi.org/project/discord-ext-pager/
 [discord-ext-menus]: https://github.com/Rapptz/discord-ext-menus
 
 The `PaginatorView` can be instantiated and used by itself, but page formatting
