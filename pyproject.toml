@@ -23,6 +23,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
+keywords = [
+    "discord",
+    "discord.py",
+    "paginator",
+    "view",
+]
 requires-python = ">=3.8"
 dependencies = [
     "discord.py>=2.0.0",
