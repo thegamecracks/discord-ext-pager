@@ -229,7 +229,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
     ):
         super().__init__(*args, **kwargs)
         if isinstance(sources, PageSource):
-            sources = [sources]
+            self.sources = [sources]
         else:
             self.sources = list(sources)
             if len(self.sources) == 0:
