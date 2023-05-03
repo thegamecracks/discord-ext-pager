@@ -478,7 +478,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         button: discord.ui.Button,
     ) -> None:
         self.stop()
-        await interaction.message.delete()  # type: ignore  # message is not None
+        await interaction.response.defer()
+        await self.message.delete()  # type: ignore  # message is not None
 
     @discord.ui.button(
         emoji="\N{LEFTWARDS ARROW WITH HOOK}",
