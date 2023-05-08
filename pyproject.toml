@@ -37,5 +37,8 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.urls]
+homepage = "https://github.com/thegamecracks/discord-ext-pager"
+
 [tool.setuptools.dynamic]
 version = { attr = "discord.ext.pager.__version__" }
