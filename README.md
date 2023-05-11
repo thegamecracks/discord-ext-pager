@@ -31,17 +31,17 @@ The `PaginatorView` can be instantiated and used by itself, but page formatting
 is handled by subclassing one of the `PageSource` base classes.
 
 ```py
-from typing import Any, List
-from discord.ext.pager import ListPageSource, PaginatorView
+from typing import List
+from discord.ext.pager import ListPageSource, PageSource, PaginatorView
 
-class EmbedListPageSource(ListPageSource[Any, None, PaginatorView]):
-    #                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+class EmbedListPageSource(ListPageSource[object, PageSource, PaginatorView]):
+    #                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     #            These type parameters denote the page item type,
     #            source type for page options (demonstrated later),
     #            and view type. Only needed for static typing.
     """Takes a list of items and formats it in an embed."""
 
-    def format_page(self, view: PaginatorView, page: List[Any]):
+    def format_page(self, view: PaginatorView, page: List[object]):
         index = self.current_index * self.page_size
         description = "\n".join(
             f"{i}. {x}"
@@ -64,11 +64,11 @@ to select from:
 from typing import List
 from discord.ext.pager import ListPageSource, PageOption, PageSource, PaginatorView
 
-class MessageSource(PageSource[str, None, PaginatorView]):
+class MessageSource(PageSource[str, PageSource, PaginatorView]):
     """A single page for displaying a string."""
 
-    def __init__(self, message: str, *, current_index: int = 0):
-        super().__init__(current_index=current_index)
+    def __init__(self, message: str):
+        super().__init__(current_index=0)
         self.message = message
 
     def get_page(self, index: int):
