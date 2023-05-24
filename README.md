@@ -21,6 +21,8 @@ in this library. Provided are the following classes:
   The base class for formatting an asynchronous iterator of items.
 - PageOption:
   A subclass of `discord.SelectOption` used for presenting navigation options.
+- StopAction:
+  An enum for customizing PaginatorView's stop button behaviour.
 - TimeoutAction:
   An enum for customizing PaginatorView's timeout behaviour.
 
