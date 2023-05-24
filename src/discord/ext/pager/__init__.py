@@ -34,6 +34,7 @@ __all__ = (
     "PageSource",
     "ListPageSource",
     "AsyncIteratorPageSource",
+    "StopAction",
     "TimeoutAction",
     "PaginatorView",
 )
@@ -175,17 +176,20 @@ class AsyncIteratorPageSource(
         return self._max_index + (not self._exhausted)
 
 
-class TimeoutAction(Enum):
-    """Specifies what action should be taken when the view times out."""
+class StopAction(Enum):
+    """Specifies the action to take when the view is stopped."""
 
     NONE = auto()
-    """On timeout, no action will occur on the message."""
+    """On stop, no action will occur on the message."""
     DISABLE = auto()
-    """On timeout, all components will be disabled."""
+    """On stop, all components will be disabled."""
     CLEAR = auto()
-    """On timeout, all components will be removed from the message."""
+    """On stop, all components will be removed from the message."""
     DELETE = auto()
-    """On timeout, the message will be deleted."""
+    """On stop, the message will be deleted."""
+
+
+TimeoutAction = StopAction  # backwards compatibility
 
 
 class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
@@ -210,6 +214,10 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
     :param sources: The current stack of page sources.
     :param allowed_users: A collection of user IDs that are allowed
         to interact with this paginator. If None, any user can interact.
+    :param stop_action:
+        The action to do when the user clicks the stop button. This may
+        not have any effect if a subclass overrides the `stop_button()`
+        component.
     :param timeout_action:
         The action to do when the view times out. This may not have any
         effect if a subclass overrides the `on_timeout()` method.
@@ -224,6 +232,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             PageSource[T, S_co, V_contra],
         ],
         allowed_users: Optional[Collection[int]] = None,
+        stop_action: StopAction = StopAction.DELETE,
         timeout_action: TimeoutAction = TimeoutAction.CLEAR,
         **kwargs,
     ):
@@ -235,6 +244,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             if len(self.sources) == 0:
                 raise ValueError("must provide at least one page source")
         self.allowed_users = allowed_users
+        self.stop_action = stop_action
         self.timeout_action = timeout_action
 
         self.message: Optional[discord.Message] = None
@@ -332,13 +342,15 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         elif action is TimeoutAction.DELETE:
             await self.message.delete()
         elif action is TimeoutAction.DISABLE:
-            for item in self.children:
-                if hasattr(item, "disabled"):
-                    item.disabled = True  # type: ignore
-
+            self._disable_components()
             await self.message.edit(view=self)
         else:
             raise TypeError(f"unknown timeout action: {action!r}")
+
+    def _disable_components(self) -> None:
+        for item in self.children:
+            if hasattr(item, "disabled"):
+                item.disabled = True  # type: ignore
 
     def _get_message_kwargs(self, *, initial_response: bool = False) -> Dict[str, Any]:
         # initial_response indicates if we can use view=None, necessary as
@@ -477,9 +489,21 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         interaction: discord.Interaction,
         button: discord.ui.Button,
     ) -> None:
+        action = self.stop_action
         self.stop()
-        await interaction.response.defer()
-        await interaction.delete_original_response()
+
+        if action is StopAction.NONE:
+            return
+        elif action is StopAction.CLEAR:
+            await interaction.response.edit_message(view=None)
+        elif action is StopAction.DELETE:
+            await interaction.response.defer()
+            await interaction.delete_original_response()
+        elif action is StopAction.DISABLE:
+            self._disable_components()
+            await interaction.response.edit_message(view=self)
+        else:
+            raise TypeError(f"unknown stop action: {action!r}")
 
     @discord.ui.button(
         emoji="\N{LEFTWARDS ARROW WITH HOOK}",
