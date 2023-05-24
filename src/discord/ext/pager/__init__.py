@@ -27,7 +27,7 @@ from typing import (
 import discord
 from typing_extensions import TypeAlias
 
-__version__ = "1.1.0"
+__version__ = "1.1.1b"
 
 __all__ = (
     "PageOption",
