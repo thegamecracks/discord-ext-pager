@@ -189,7 +189,17 @@ class StopAction(Enum):
     """On stop, the message will be deleted."""
 
 
-TimeoutAction = StopAction  # backwards compatibility
+class TimeoutAction(Enum):
+    """Specifies the action to take when the view times out."""
+
+    NONE = auto()
+    """On timeout, no action will occur on the message."""
+    DISABLE = auto()
+    """On timeout, all components will be disabled."""
+    CLEAR = auto()
+    """On timeout, all components will be removed from the message."""
+    DELETE = auto()
+    """On timeout, the message will be deleted."""
 
 
 class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
