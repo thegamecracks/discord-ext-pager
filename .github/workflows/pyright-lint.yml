@@ -19,7 +19,7 @@ jobs:
         python-version-file: pyproject.toml
     - name: Install pyright
       run: pip install pyright
-    - name: Install berconpy
+    - name: Install discord-ext-pager
       run: pip install .
     - name: Run pyright
       run: pyright
