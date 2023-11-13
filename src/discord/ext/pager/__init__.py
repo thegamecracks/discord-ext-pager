@@ -262,6 +262,8 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.options: Sequence[PageOption[S_co]] = []
         self.option_sources: dict[str, PageSource] = {}
 
+        self._last_interaction: Optional[discord.Interaction] = None
+
     @property
     def current_source(self) -> PageSource[T, S_co, V_contra]:
         return self.sources[-1]
@@ -334,6 +336,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
             else:
                 await channel.response.send_message(ephemeral=ephemeral, **kwargs)
                 self.message = await channel.original_response()
+                self._last_interaction = channel
         else:
             self.message = await channel.send(**self._get_message_kwargs())
 
@@ -343,17 +346,28 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         return True
 
     async def on_timeout(self) -> None:
-        action = self.timeout_action
-        if self.message is None or action is TimeoutAction.NONE:
-            return
+        async def delete_message() -> None:
+            if self._last_interaction is not None:
+                await self._last_interaction.delete_original_response()
+            elif self.message is not None:
+                await self.message.delete()
 
-        if action is TimeoutAction.CLEAR:
-            await self.message.edit(view=None)
+        async def edit_message(**kwargs) -> None:
+            if self._last_interaction is not None:
+                await self._last_interaction.edit_original_response(**kwargs)
+            elif self.message is not None:
+                await self.message.edit(**kwargs)
+
+        action = self.timeout_action
+        if action is TimeoutAction.NONE:
+            pass
+        elif action is TimeoutAction.CLEAR:
+            await edit_message(view=None)
         elif action is TimeoutAction.DELETE:
-            await self.message.delete()
+            await delete_message()
         elif action is TimeoutAction.DISABLE:
             self._disable_components()
-            await self.message.edit(view=self)
+            await edit_message(view=self)
         else:
             raise TypeError(f"unknown timeout action: {action!r}")
 
@@ -380,6 +394,7 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
 
     async def _respond(self, interaction: discord.Interaction) -> None:
         await interaction.response.edit_message(**self._get_message_kwargs())
+        self._last_interaction = interaction
 
     # noinspection PyUnresolvedReferences
     def _refresh_components(self) -> None:
