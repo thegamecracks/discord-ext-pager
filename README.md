@@ -36,11 +36,7 @@ is handled by subclassing one of the `PageSource` base classes.
 from typing import List
 from discord.ext.pager import ListPageSource, PageSource, PaginatorView
 
-class EmbedListPageSource(ListPageSource[object, PageSource, PaginatorView]):
-    #                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    #            These type parameters denote the page item type,
-    #            source type for page options (demonstrated later),
-    #            and view type. Only needed for static typing.
+class EmbedListPageSource(ListPageSource):
     """Takes a list of items and formats it in an embed."""
 
     def format_page(self, view: PaginatorView, page: List[object]):
@@ -66,8 +62,8 @@ to select from:
 from typing import List
 from discord.ext.pager import ListPageSource, PageOption, PageSource, PaginatorView
 
-class MessageSource(PageSource[str, PageSource, PaginatorView]):
-    """A single page for displaying a string."""
+class MessageSource(PageSource):
+    """A page source that simply displays a string in the message content."""
 
     def __init__(self, message: str):
         super().__init__(current_index=0)
@@ -77,16 +73,14 @@ class MessageSource(PageSource[str, PageSource, PaginatorView]):
         return self.message
 
     def format_page(self, view: PaginatorView, page: str):
-        # If we don't specify both content and embed, either will
-        # persist as the user clicks between options
         return {"content": page, "embed": None}
 
-class MessageNavigator(ListPageSource[MessageSource, MessageSource, PaginatorView]):
-    """A list of messages for the user to select from."""
+class MessageNavigator(ListPageSource):
+    """A list of messages that the user can select to view."""
 
     def get_page_options(self, view: PaginatorView, page: List[MessageSource]):
-        # PageOption() takes the same arguments as discord.SelectOption,
-        # except that source= is also required
+        # PageOption() takes the same arguments as discord.SelectOption
+        # plus a source= argument
         return [PageOption(source=source, label=source.message) for source in page]
 
     def format_page(self, view: PaginatorView, page: List[MessageSource]):
