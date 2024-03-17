@@ -29,8 +29,8 @@ in this library. Provided are the following classes:
 [discord-ext-pager]: https://pypi.org/project/discord-ext-pager/
 [discord-ext-menus]: https://github.com/Rapptz/discord-ext-menus
 
-The `PaginatorView` can be instantiated and used by itself, but page formatting
-is handled by subclassing one of the `PageSource` base classes.
+While the `PaginatorView` can be instantiated and used by itself, page formatting
+is handled by subclassing one of the `PageSource` base classes:
 
 ```py
 from typing import List
@@ -54,9 +54,8 @@ view = PaginatorView(sources=source, timeout=180)
 await view.start(interaction)
 ```
 
-If the navigation select menu is desired, the `get_page_options()` method
-should be overridden to return a list of `PageOption` objects for the user
-to select from:
+A navigation select menu for sub-pages can be added by overriding the
+`get_page_options()` method to return a list of `PageOption` objects:
 
 ```py
 from typing import List
@@ -94,7 +93,7 @@ view = PaginatorView(sources=source)
 await view.start(ctx)
 ```
 
-When an option is selected, the `PageSource` contained within that option
+Once an option is selected, the `PageSource` contained within that option
 is appended to `PaginatorView.sources`, causing that source to be displayed.
 Another button is automatically provided for users to back out to the last
 page source. This can be manually triggered by passing a list of page sources
