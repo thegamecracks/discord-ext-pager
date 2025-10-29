@@ -7,6 +7,8 @@ name = "discord-ext-pager"
 description = "A view-based paginator library for discord.py 2.0"
 authors = [{ name = "thegamecracks" }]
 readme = "README.md"
+license = "MPL-2.0"
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Framework :: AsyncIO",
