@@ -315,7 +315,9 @@ class PaginatorView(discord.ui.View, Generic[T, S_co, V_contra]):
         self.page = cast(_PageParams, params)
 
         options: Sequence[PageOption[S_co]] = await maybe_coro(
-            self.current_source.get_page_options, self, page  # type: ignore
+            self.current_source.get_page_options,
+            self,  # type: ignore
+            page,
         )
         option_sources = {}
         for i, option in enumerate(options):
