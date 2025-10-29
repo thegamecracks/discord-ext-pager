@@ -135,7 +135,7 @@ class ListPageSource(
         return self.items[start : start + self.page_size]
 
     @functools.cached_property
-    def max_pages(self) -> int:
+    def max_pages(self) -> int:  # pyright: ignore[reportIncompatibleMethodOverride]
         pages, remainder = divmod(len(self.items), self.page_size)
         return pages + bool(remainder)
 
