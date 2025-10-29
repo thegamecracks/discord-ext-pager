@@ -27,7 +27,15 @@ from typing import (
 import discord
 from typing_extensions import TypeAlias
 
-__version__ = "1.1.3"
+
+def _get_version() -> str:
+    from importlib.metadata import version
+
+    return version("discord-ext-pager")
+
+
+__version__ = _get_version()
+
 
 __all__ = (
     "PageOption",
