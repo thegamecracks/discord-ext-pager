@@ -5,6 +5,7 @@ on:
     paths:
       - src/**
       - pyproject.toml
+      - uv.lock
   workflow_dispatch:
     inputs:
       can_publish:
