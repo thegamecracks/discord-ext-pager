@@ -19,9 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v8.2.0
-        with:
-          python-version: '3.11'
-          enable-cache: true
       - run: uv sync --locked --all-extras --dev
       - run: uvx ty check --output-format github
       - run: uvx pyright --pythonpath .venv/bin/python
