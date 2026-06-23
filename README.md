@@ -4,6 +4,34 @@
 
 A simple view-based paginator library for discord.py 2.0. Works with Python 3.8+.
 
+> [!NOTE]
+>
+> This library was written before Discord introduced
+> [Components v2](https://docs.discord.com/developers/components/overview).
+> You can still use this library, but if you want the
+> *latest-and-greatest Discord UI design*,
+> I suggest writing your own paginator with the new
+> [LayoutView](https://discordpy.readthedocs.io/en/stable/interactions/api.html#layoutview)
+> components.
+>
+> Not sure how to get started with Components v2 in discord.py?
+> - See Discord's [official documentation](https://docs.discord.com/developers/components/reference),
+>   for an idea of what components are available
+> - See discord.py's [API reference](https://discordpy.readthedocs.io/en/stable/interactions/api.html#layoutview)
+>   for the corresponding components
+> - See discord.py's [examples](https://github.com/Rapptz/discord.py/tree/master/examples/views)
+>   (look for files using the `LayoutView` class, not `View`)
+> - See the unofficial [discord.py masterclass](https://fallendeity.github.io/discord.py-masterclass/components-v2/)
+>   guide
+> - See an example of layout views in my other project, [ministatus](https://github.com/thegamecracks/ministatus)
+>
+>   This includes stack-based navigation in the form of
+>   [`Book`](https://github.com/thegamecracks/ministatus/blob/main/src/ministatus/bot/cogs/status/views/book.py)s
+>   and `Page`s, inspired by nested PageOptions from this library.
+>   The UI does not showcase pagination specifically, but hopefully you can
+>   get an idea of how to design complex UIs with LayoutViews.
+>   And yes, the book-and-page terminology doesn't make sense 🙃
+
 ## Usage
 
 [discord-ext-pager] is available on PyPI, and as such can be installed using pip.
