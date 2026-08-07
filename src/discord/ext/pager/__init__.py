@@ -24,8 +24,9 @@ from typing import (
     cast,
 )
 
-import discord
 from typing_extensions import TypeAlias
+
+import discord
 
 
 def _get_version() -> str:
@@ -38,13 +39,13 @@ __version__ = _get_version()
 
 
 __all__ = (
+    "AsyncIteratorPageSource",
+    "ListPageSource",
     "PageOption",
     "PageSource",
-    "ListPageSource",
-    "AsyncIteratorPageSource",
+    "PaginatorView",
     "StopAction",
     "TimeoutAction",
-    "PaginatorView",
 )
 
 E = TypeVar("E")
