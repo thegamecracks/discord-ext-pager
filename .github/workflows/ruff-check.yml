@@ -12,6 +12,8 @@ on:
       - pyproject.toml
       - uv.lock
 
+permissions: {}
+
 jobs:
   lint:
     runs-on: ubuntu-latest
