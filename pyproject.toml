@@ -40,5 +40,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/thegamecracks/discord-ext-pager"
 
+[tool.ruff.lint]
+ignore = ["FA100"]
+
 [tool.uv.build-backend]
 module-name = "discord.ext.pager"
