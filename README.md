@@ -64,16 +64,17 @@ is handled by subclassing one of the `PageSource` base classes:
 from typing import List
 from discord.ext.pager import ListPageSource, PageSource, PaginatorView
 
+
 class EmbedListPageSource(ListPageSource):
     """Takes a list of items and formats it in an embed."""
 
     def format_page(self, view: PaginatorView, page: List[object]):
         index = self.current_index * self.page_size
         description = "\n".join(
-            f"{i}. {x}"
-            for i, x in enumerate(page, start=index + 1)
+            f"{i}. {x}" for i, x in enumerate(page, start=index + 1)
         )
         return discord.Embed(description=description)
+
 
 # Anywhere a channel or interaction is available:
 fruits = ["🍎 Apple", "🍊 Orange", "🍋 Lemon"]
@@ -89,6 +90,7 @@ A navigation select menu for sub-pages can be added by overriding the
 from typing import List
 from discord.ext.pager import ListPageSource, PageOption, PageSource, PaginatorView
 
+
 class MessageSource(PageSource):
     """A page source that simply displays a string in the message content."""
 
@@ -102,6 +104,7 @@ class MessageSource(PageSource):
     def format_page(self, view: PaginatorView, page: str):
         return {"content": page, "embed": None}
 
+
 class MessageNavigator(ListPageSource):
     """A list of messages that the user can select to view."""
 
@@ -114,6 +117,7 @@ class MessageNavigator(ListPageSource):
         description = "\n".join(source.message for source in page)
         embed = discord.Embed(description=description)
         return {"content": None, "embed": embed}
+
 
 hands = "👈👉👆👇🫵🤞🫰🤘🤙🤛🤜✊👊👋👏🙌"
 source = MessageNavigator([MessageSource(s) for s in hands], page_size=5)
